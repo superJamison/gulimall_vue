@@ -1,13 +1,22 @@
 <template>
   <div>
+    <el-switch
+      v-model="draggable"
+      active-text="开启菜单拖拽"
+      style="margin: 0 20px;">
+    </el-switch>
+    <el-button type="danger" @click="batchDelete">批量删除</el-button>
     <el-tree
       :data="menus"
       :props="defaultProps"
       @node-click="handleNodeClick"
       :expand-on-click-node="false"
       :default-expanded-keys="expandedList"
-      show-checkbox
+      :show-checkbox="true"
       node-key="catId"
+      :highlight-current="true"
+      ref="menusTree"
+      :draggable="draggable"
     >
     <span class="custom-tree-node" slot-scope="{ node, data }">
       <span>{{ node.label }}</span>
@@ -56,6 +65,7 @@ export default {
         children: 'children',
         label: 'name'
       },
+      draggable: false,
       dialogType: '',
       category: {
         name: '',
@@ -71,11 +81,36 @@ export default {
   },
   methods: {
     handleNodeClick (data) {
-      console.log(data)
     },
-    edit(data){
-      console.log(data);
-      this.dialogType = 'edit'
+    batchDelete(){
+      let catIds = []
+      let catNames = []
+      let checkMenus = this.$refs.menusTree.getCheckedNodes()
+      console.log("checkMenus---->",checkMenus)
+      if(checkMenus.length === 0){
+        this.$message.error('您还未选择菜单，请选择您要删除的菜单！')
+        return
+      }
+      for (let i = 0; i < checkMenus.length; i++){
+        catIds.push(checkMenus[i].catId)
+        catNames.push(checkMenus[i].name)
+      }
+      this.$confirm(`是否批量删除【${catNames}】菜单`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('/product/category/delete'),
+          method: 'post',
+          data: this.$http.adornData(catIds, false)
+        }).then(({data}) => {
+          this.$message.success('批量删除'+data.msg)
+          this.getMenus()
+        })
+      }).catch(() => {
+        this.$message.error('已取消批量删除！')
+      })
     },
     getMenus () {
       this.$http({
@@ -86,14 +121,22 @@ export default {
       })
     },
     append (data) {
-      console.log('append:', data)
       this.dialogType = 'add'
       this.dialogFormVisible = true
       this.category.parentCid = data.catId
       this.category.catLevel = data.catLevel * 1 + 1
     },
+    edit(data){
+      console.log("edit-->",data);
+      this.dialogType = 'edit'
+      this.dialogFormVisible = true
+      this.category.catId = data.catId
+      this.category.name = data.name
+      this.category.icon = data.icon
+      this.category.productUnit = data.productUnit
+      this.category.parentCid = data.parentCid
+    },
     addCategory(){
-      console.log("category---->",this.category);
       this.$http({
           url: this.$http.adornUrl('/product/category/save'),
           method: 'post',
@@ -103,11 +146,45 @@ export default {
         this.dialogFormVisible = false
         this.$message.success('分类添加'+data.msg)
         this.getMenus()
-        this.expandedList = [this.category.parentCid]
-        this.category = {}
+        this.expandedList.push(this.category.parentCid)
+        this.category = {
+          name: '',
+          icon: '',
+          productUnit: '',
+          parentCid: 0,
+          catLevel: 0,
+          showStatus: 1,
+          sort: 0
+        }
       })
       .catch((result) => {
-        this.$message.error('分类添加失败！')
+        this.$message.error('分类添加failed！')
+      })
+    },
+    editCategory(){
+      let {catId, name, icon, productUnit} = this.category
+      this.$http({
+          url: this.$http.adornUrl('/product/category/update'),
+          method: 'post',
+          data: this.$http.adornData({catId, name, icon, productUnit}, false)
+      })
+      .then(({data}) => {
+        this.dialogFormVisible = false
+        this.$message.success('分类修改'+data.msg)
+        this.getMenus()
+        this.expandedList.push(this.category.parentCid)
+        this.category = {
+          name: '',
+          icon: '',
+          productUnit: '',
+          parentCid: 0,
+          catLevel: 0,
+          showStatus: 1,
+          sort: 0
+        }
+      })
+      .catch((result) => {
+          console.log(result)
       })
     },
     remove (node, data) {
@@ -128,14 +205,14 @@ export default {
           this.expandedList = [node.parent.data.catId]
         })
       }).catch(() => {
-
+        this.$message.error('已取消分类删除！')
       })
     },
     submitForm() {
       if (this.dialogType === 'add'){
         this.addCategory()
       }else if (this.dialogType === 'edit'){
-
+        this.editCategory()
       }
     }
   },
