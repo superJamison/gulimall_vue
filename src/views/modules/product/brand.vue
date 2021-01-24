@@ -153,7 +153,7 @@
         console.log("data----->",data);
         let {brandId, showStatus} = data
         this.$http({
-            url: this.$http.adornUrl('/product/brand/update'),
+            url: this.$http.adornUrl('/product/brand/update/status'),
             method: 'post',
             data: this.$http.adornData({brandId, showStatus}, false)
         })
