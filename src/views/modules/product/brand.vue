@@ -150,7 +150,7 @@
         })
       },
       updateBrandStatus (data) {
-        console.log("data----->",data);
+        // console.log("data----->",data);
         let {brandId, showStatus} = data
         this.$http({
             url: this.$http.adornUrl('/product/brand/update/status'),

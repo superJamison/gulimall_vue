@@ -32,7 +32,7 @@
         },
         // tree点击
         nodeClick(data, node, el){
-          if (node.data.children.length === 0){
+          if (node.childNodes.length === 0){
             this.$emit("tree-node-click", data, node, el)
           }
         }

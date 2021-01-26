@@ -2,6 +2,7 @@
   <el-dialog
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
+    @closed="dialogClosed"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="100px">
     <el-form-item label="组名" prop="attrGroupName">
@@ -22,6 +23,7 @@
         v-model="dataForm.catelogPath"
         :options="categorys"
         :props="props"
+        :filterable="true"
         ></el-cascader>
     </el-form-item>
     </el-form>
@@ -72,6 +74,9 @@
       }
     },
     methods: {
+      dialogClosed(){
+        this.dataForm.catelogPath = []
+      },
       getCategorys(){
         this.$http({
           url: this.$http.adornUrl('/product/category/list/tree'),
