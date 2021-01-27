@@ -107,14 +107,14 @@ export default {
         url: this.$http.adornUrl("/product/category/list/tree"),
         method: "get"
       }).then(({ data }) => {
-        // console.log("成功获取到菜单数据...", data.data);
+        console.log("成功获取到菜单数据...", data.data);
         this.menus = data.data;
       });
     },
     batchDelete() {
       let catIds = [];
       let checkedNodes = this.$refs.menuTree.getCheckedNodes();
-      // console.log("被选中的元素", checkedNodes);
+      console.log("被选中的元素", checkedNodes);
       for (let i = 0; i < checkedNodes.length; i++) {
         catIds.push(checkedNodes[i].catId);
       }
@@ -158,7 +158,7 @@ export default {
       });
     },
     handleDrop(draggingNode, dropNode, dropType, ev) {
-      // console.log("handleDrop: ", draggingNode, dropNode, dropType);
+      console.log("handleDrop: ", draggingNode, dropNode, dropType);
       //1、当前节点最新的父节点id
       let pCid = 0;
       let siblings = null;
@@ -244,7 +244,7 @@ export default {
       }
     },
     edit(data) {
-      // console.log("要修改的数据", data);
+      console.log("要修改的数据", data);
       this.dialogType = "edit";
       this.title = "修改分类";
       this.dialogVisible = true;

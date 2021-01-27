@@ -120,7 +120,6 @@ export default {
             method: "get",
             params: this.$http.adornParams()
           }).then(({ data }) => {
-            console.log(data);
             if (data && data.code === 0) {
               this.dataForm.name = data.brand.name;
               this.dataForm.logo = data.brand.logo;
