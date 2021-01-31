@@ -124,7 +124,7 @@ export default {
     this.getDataList();
   },
   created() {
-    
+
   },
   methods: {
     opendrawer(row){
@@ -160,7 +160,7 @@ export default {
             type: "success",
             duration: 1500
           });
-          
+
           this.userId = "";
           this.getDataList();
         } else {
@@ -189,7 +189,8 @@ export default {
         params: this.$http.adornParams({
           page: this.pageIndex,
           limit: this.pageSize,
-          key: this.dataForm.key
+          key: this.dataForm.key,
+          status: this.dataForm.status
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
